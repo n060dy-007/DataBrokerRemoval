@@ -687,21 +687,9 @@ const App = () => {
         )}
       </AnimatePresence>
 
-      {/* Global CSS for layout elements used in Tailwind classes */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        .glass { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-        .flex-center { display: flex; items-center: center; justify-content: center; }
-        .italic-shadow { text-shadow: 2px 2px 20px rgba(37, 99, 235, 0.4); }
-        .animate-spin-slow { animation: spin 12s linear infinite; }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.05); border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.1); }
-      ` }} />
+
     </div>
   );
 };
-
 
 export default App;

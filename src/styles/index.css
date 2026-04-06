@@ -1,13 +1,17 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 :root {
-  --color-onyx: #121212;
+  --color-onyx: #060606;
   --color-slate-900: #1a1b1e;
   --color-slate-800: #2c2e33;
   --color-slate-300: #909296;
-  --color-accent-blue: #339af0;
-  --color-accent-blue-dim: rgba(51, 154, 240, 0.1);
-  --color-glass-bg: rgba(26, 27, 30, 0.7);
+  --color-accent-blue: #2563eb;
+  --color-accent-blue-dim: rgba(37, 99, 235, 0.1);
+  --color-glass-bg: rgba(255, 255, 255, 0.03);
   --color-glass-border: rgba(255, 255, 255, 0.05);
   --color-text-vibrant: #ffffff;
   --color-text-dim: #a6a7ab;
@@ -15,16 +19,13 @@
 }
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
 }
 
 body {
   background-color: var(--color-onyx);
   color: var(--color-text-vibrant);
-  font-family: 'Inter', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
   overflow-x: hidden;
 }
 
@@ -34,47 +35,41 @@ h1, h2, h3, .brand-font {
 
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-onyx);
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-slate-800);
+  background: rgba(255, 255, 255, 0.06);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-slate-300);
+  background: rgba(255, 255, 255, 0.12);
 }
 
 /* Glassmorphism Classes */
 .glass {
   background: var(--color-glass-bg);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--color-glass-border);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 }
 
 .glass-card {
-  transition: transform 0.2s var(--transition-smooth), border-color 0.2s var(--transition-smooth);
+  transition: transform 0.25s var(--transition-smooth), border-color 0.25s var(--transition-smooth), box-shadow 0.25s var(--transition-smooth);
 }
 
 .glass-card:hover {
-  border-color: var(--color-accent-blue);
-  transform: translateY(-4px);
+  border-color: rgba(37, 99, 235, 0.3) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 40px rgba(37, 99, 235, 0.08);
 }
 
 /* Layout Utilities */
-.container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
-
 .flex-center {
   display: flex;
   align-items: center;
@@ -91,16 +86,30 @@ h1, h2, h3, .brand-font {
   animation: fadeIn 0.6s var(--transition-smooth) forwards;
 }
 
-/* Badge Styles */
-.badge {
-  padding: 0.25rem 0.6rem;
-  border-radius: 6px;
-  font-size: 0.75rem;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+/* Text Shadow for Headers */
+.italic-shadow {
+  text-shadow: 2px 2px 20px rgba(37, 99, 235, 0.4);
 }
 
-.badge-low { background: #2f3e2d; color: #8ce99a; }
-.badge-mid { background: #3e3a2d; color: #ffd8a8; }
-.badge-high { background: #3e2d2d; color: #ff8787; }
+/* Custom Scrollbar for inner elements */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Selection */
+::selection {
+  background: rgba(37, 99, 235, 0.3);
+}
