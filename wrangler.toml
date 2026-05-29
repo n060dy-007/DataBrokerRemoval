@@ -1,12 +1,11 @@
-# Cloudflare Wrangler config for Data Broker Removal Agent
-# Deploy with: npx wrangler pages deploy dist --project-name=antigravity-dbr
+# wrangler.toml
+# Configuration for Cloudflare Pages + Wrangler
 
 name = "antigravity-data-broker-removal"
 compatibility_date = "2025-05-01"
 
-[pages_build_output_dir]
-# We build with Vite into dist/
-# Use `npm run build && npx wrangler pages deploy dist`
+# This is the key setting Cloudflare Pages needs when it detects wrangler.toml
+pages_build_output_dir = "dist"
 
-# Optional: Add custom domain or other Pages settings in dashboard
-# For production, connect this repo to Cloudflare Pages in the dashboard (recommended)
+# You can still deploy manually with:
+#   npm run build && npx wrangler pages deploy dist
