@@ -203,15 +203,34 @@ const App = () => {
 
   // Global loading state (persisted state + large data chunk)
   if (!isLoaded || dataLoading) {
+    // Use mostly inline styles so this shows even if the main CSS bundle has issues
     return (
-      <div className="min-h-screen bg-[#060606] text-slate-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-12 h-12 mx-auto mb-6 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center">
-            <Shield className="text-blue-500" size={28} />
+      <div style={{
+        minHeight: '100vh',
+        background: '#060606',
+        color: '#e2e8f0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontFamily: 'system-ui, sans-serif'
+      }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{
+            width: 48,
+            height: 48,
+            margin: '0 auto 24px',
+            borderRadius: 16,
+            background: 'rgba(37, 99, 235, 0.1)',
+            border: '1px solid rgba(37, 99, 235, 0.2)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Shield color="#3b82f6" size={28} />
           </div>
-          <div className="text-sm font-black uppercase tracking-[3px] text-blue-400 mb-2">ANTIGRAVITY</div>
-          <div className="text-2xl font-black tracking-tighter">Loading Privacy Intel...</div>
-          <div className="text-xs text-slate-500 mt-3">Fetching 180+ data broker profiles</div>
+          <div style={{ fontSize: 12, fontWeight: 900, letterSpacing: 3, color: '#60a5fa', marginBottom: 8 }}>ANTIGRAVITY</div>
+          <div style={{ fontSize: 28, fontWeight: 900, letterSpacing: -1 }}>Loading Privacy Intel...</div>
+          <div style={{ fontSize: 12, color: '#64748b', marginTop: 12 }}>Fetching 180+ data broker profiles</div>
         </div>
       </div>
     );
@@ -219,12 +238,44 @@ const App = () => {
 
   if (dataError) {
     return (
-      <div className="min-h-screen bg-[#060606] text-slate-100 flex items-center justify-center p-6">
-        <div className="max-w-md text-center glass p-10 rounded-3xl">
-          <AlertCircle className="mx-auto mb-4 text-rose-400" size={40} />
-          <div className="text-xl font-black mb-2">Data Load Failed</div>
-          <p className="text-sm text-slate-400">{dataError}</p>
-          <button onClick={() => window.location.reload()} className="mt-6 px-6 py-3 bg-white/5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-white/10">Reload Agent</button>
+      <div style={{
+        minHeight: '100vh',
+        background: '#060606',
+        color: '#e2e8f0',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 24,
+        fontFamily: 'system-ui, sans-serif'
+      }}>
+        <div style={{
+          maxWidth: 420,
+          textAlign: 'center',
+          background: 'rgba(255,255,255,0.03)',
+          border: '1px solid rgba(255,255,255,0.1)',
+          padding: 40,
+          borderRadius: 24
+        }}>
+          <AlertCircle color="#f87171" size={40} style={{ margin: '0 auto 16px' }} />
+          <div style={{ fontSize: 20, fontWeight: 900, marginBottom: 8 }}>Data Load Failed</div>
+          <p style={{ fontSize: 14, color: '#94a3b8' }}>{dataError}</p>
+          <button 
+            onClick={() => window.location.reload()} 
+            style={{
+              marginTop: 24,
+              padding: '12px 24px',
+              background: 'rgba(255,255,255,0.05)',
+              border: 'none',
+              borderRadius: 12,
+              color: '#e2e8f0',
+              fontSize: 12,
+              fontWeight: 900,
+              letterSpacing: 1,
+              cursor: 'pointer'
+            }}
+          >
+            Reload Agent
+          </button>
         </div>
       </div>
     );
