@@ -1,0 +1,31 @@
+# Cloudflare Pages Headers - Data Broker Removal Agent
+# Optimized caching + security for privacy tool
+
+# Immutable static assets - aggressive long-term caching (Cloudflare edge will respect this)
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+# HTML - no cache (so updates propagate fast), security headers
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none';
+
+# Root index
+/
+  Cache-Control: public, max-age=0, must-revalidate
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+
+# CSS - long cache with revalidate
+*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# JS chunks - long cache (Vite adds content hashes)
+/*.js
+  Cache-Control: public, max-age=31536000, immutable

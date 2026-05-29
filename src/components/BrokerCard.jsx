@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ExternalLink, Mail, Shield, AlertTriangle, CheckCircle, ChevronDown, ChevronUp, StickyNote, X, RefreshCw, Check } from 'lucide-react';
+import { ExternalLink, Mail, ChevronDown, ChevronUp, StickyNote, X, RefreshCw, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const BrokerCard = ({ 

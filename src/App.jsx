@@ -1,13 +1,12 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { 
-  Search, Filter, Shield, Settings, Mail, X, Copy, Check, Globe, 
-  AlertCircle, Info, LayoutGrid, List, BarChart3, Users, 
-  History, User, Play, Sparkles, LogOut, Trash2, RefreshCw, MapPin
+  Search, Shield, Mail, X, Copy, Check, 
+  AlertCircle, LayoutGrid, BarChart3, 
+  History, User, Play, Sparkles, LogOut, Trash2, RefreshCw, MapPin, Phone
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { R as brokers, CM as CATEGORIES } from './data/brokers';
 import BrokerCard from './components/BrokerCard';
-import { generateEmailTemplate, createGmailDraft } from './utils/simulator';
+import { generateEmailTemplate, createGmailDraft, copyToClipboard } from './utils/simulator';
 import { saveState, loadState, clearState } from './utils/storage';
 
 const App = () => {
@@ -37,8 +36,33 @@ const App = () => {
   const [activityLog, setActivityLog] = useState([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load state on mount
+  // Large dataset loaded asynchronously for better Cloudflare / bundle splitting
+  const [brokers, setBrokers] = useState([]);
+  const [CATEGORIES, setCATEGORIES] = useState({});
+  const [dataLoading, setDataLoading] = useState(true);
+  const [dataError, setDataError] = useState(null);
+
+  // Load broker data (code-split chunk) + persisted user state on mount
   useEffect(() => {
+    let mounted = true;
+
+    // Dynamically import the large brokers dataset (creates its own chunk)
+    import('./data/brokers.js')
+      .then(mod => {
+        if (!mounted) return;
+        setBrokers(mod.R || []);
+        setCATEGORIES(mod.CM || {});
+        setDataLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to load broker data', err);
+        if (mounted) {
+          setDataError('Failed to load data broker list. Please refresh.');
+          setDataLoading(false);
+        }
+      });
+
+    // Load saved progress/profile
     const saved = loadState();
     if (saved) {
       if (saved.progress) setProgress(saved.progress);
@@ -47,6 +71,8 @@ const App = () => {
       if (saved.activityLog) setActivityLog(saved.activityLog);
     }
     setIsLoaded(true);
+
+    return () => { mounted = false; };
   }, []);
 
   // Save state whenever important data changes
@@ -65,7 +91,7 @@ const App = () => {
     const progressPct = Math.round((removedView / total) * 100);
     
     return { total, removed: removedView, pending: pendingView, remaining, progressPct };
-  }, [progress]);
+  }, [brokers, progress]);
 
   const filteredBrokers = useMemo(() => {
     return brokers.filter(b => {
@@ -79,7 +105,7 @@ const App = () => {
       if (a[10] !== 'c' && b[10] === 'c') return 1;
       return 0;
     });
-  }, [searchTerm, category, difficulty]);
+  }, [brokers, searchTerm, category, difficulty]);
 
   // Handlers
   const handleStatusChange = useCallback((id, status) => {
@@ -119,8 +145,8 @@ const App = () => {
     
     if (result.ok) {
       handleStatusChange(broker[0], 'pending');
-      addLog(broker[1], 'Email Drafted', `Sent to ${template.to}`);
-      alert("Success! Draft created in your Gmail.");
+      addLog(broker[1], 'Email Drafted', `Prepared for ${template.to}`);
+      alert(result.message || "Email template copied to clipboard.");
     } else {
       alert(`Error: ${result.message}`);
     }
@@ -139,13 +165,15 @@ const App = () => {
 
     if (!confirm(`This will generate Gmail drafts for ${targetBrokers.length} brokers. Continue?`)) return;
 
+    let successCount = 0;
     for (const b of targetBrokers) {
       const template = generateEmailTemplate(b, userData);
-      await createGmailDraft(template.to, template.subject, template.body);
+      const res = await createGmailDraft(template.to, template.subject, template.body);
+      if (res.ok) successCount++;
       handleStatusChange(b[0], 'pending');
-      addLog(b[1], 'Batch Email', 'Automated draft created');
+      addLog(b[1], 'Batch Email', 'Template prepared');
     }
-    alert("Batch drafting complete.");
+    alert(`Batch complete. ${successCount} professional emails copied to clipboard. Paste them into your mail client (Gmail recommended).`);
   };
 
   const handleReset = () => {
@@ -155,16 +183,52 @@ const App = () => {
     }
   };
 
-  const copyTemplate = (text) => {
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-    addLog(selectedBroker[1], 'Template Copied', 'Manual copy to clipboard');
+  const clearActivityLog = () => {
+    if (activityLog.length === 0) return;
+    if (confirm(`Clear all ${activityLog.length} mission log entries?`)) {
+      setActivityLog([]);
+    }
+  };
+
+  const copyTemplate = async (text) => {
+    const success = await copyToClipboard(text);
+    if (success) {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+    addLog(selectedBroker?.[1] || 'Broker', 'Template Copied', 'Manual copy to clipboard');
   };
 
   const currentTemplate = selectedBroker ? generateEmailTemplate(selectedBroker, userData) : null;
 
-  if (!isLoaded) return null;
+  // Global loading state (persisted state + large data chunk)
+  if (!isLoaded || dataLoading) {
+    return (
+      <div className="min-h-screen bg-[#060606] text-slate-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 mx-auto mb-6 rounded-2xl bg-blue-600/10 border border-blue-500/20 flex items-center justify-center">
+            <Shield className="text-blue-500" size={28} />
+          </div>
+          <div className="text-sm font-black uppercase tracking-[3px] text-blue-400 mb-2">ANTIGRAVITY</div>
+          <div className="text-2xl font-black tracking-tighter">Loading Privacy Intel...</div>
+          <div className="text-xs text-slate-500 mt-3">Fetching 180+ data broker profiles</div>
+        </div>
+      </div>
+    );
+  }
+
+  if (dataError) {
+    return (
+      <div className="min-h-screen bg-[#060606] text-slate-100 flex items-center justify-center p-6">
+        <div className="max-w-md text-center glass p-10 rounded-3xl">
+          <AlertCircle className="mx-auto mb-4 text-rose-400" size={40} />
+          <div className="text-xl font-black mb-2">Data Load Failed</div>
+          <p className="text-sm text-slate-400">{dataError}</p>
+          <button onClick={() => window.location.reload()} className="mt-6 px-6 py-3 bg-white/5 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-white/10">Reload Agent</button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#060606] text-slate-100 font-sans selection:bg-blue-500/30 overflow-x-hidden">
@@ -433,7 +497,7 @@ const App = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                   <AnimatePresence mode="popLayout">
-                    {filteredBrokers.slice(0, 50).map((broker) => (
+                    {filteredBrokers.slice(0, 80).map((broker) => (
                       <BrokerCard 
                         key={broker[0]} 
                         broker={broker} 
@@ -446,6 +510,12 @@ const App = () => {
                     ))}
                   </AnimatePresence>
                 </div>
+
+                {filteredBrokers.length > 80 && (
+                  <div className="text-center mt-4 text-[10px] font-bold text-slate-500 uppercase tracking-widest">
+                    Showing first 80 of {filteredBrokers.length} matches — use search/filters to narrow results
+                  </div>
+                )}
 
                 {filteredBrokers.length === 0 && (
                   <div className="text-center py-32 glass rounded-3xl border-dashed border-white/10 italic">
@@ -476,16 +546,21 @@ const App = () => {
 
                   <div className="space-y-6">
                     {[
-                      { id: 'fullName', label: 'Authorized Name', icon: User, placeholder: 'Legal Entity Name' },
-                      { id: 'email', label: 'Contact Email', icon: Mail, type: 'email', placeholder: 'primary@domain.com' },
-                      { id: 'city', label: 'Primary City', icon: Globe, placeholder: 'Operational Base (City)' },
-                      { id: 'state', label: 'State/Region', icon: MapPin, placeholder: 'CA / TX / NY' }
+                      { id: 'fullName', label: 'Authorized Name', placeholder: 'Legal Entity Name' },
+                      { id: 'email', label: 'Contact Email', type: 'email', placeholder: 'primary@domain.com' },
+                      { id: 'phone', label: 'Phone Number', placeholder: '(555) 123-4567' },
+                      { id: 'address', label: 'Physical Address', placeholder: '123 Privacy Lane' },
+                      { id: 'city', label: 'Primary City', placeholder: 'Operational Base (City)' },
+                      { id: 'state', label: 'State/Region', placeholder: 'CA / TX / NY' }
                     ].map(field => (
                       <div key={field.id} className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-slate-600 ml-1 leading-none">{field.label}</label>
                         <div className="relative group/input">
                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-700 group-focus-within/input:text-blue-500 transition-colors">
-                             {field.id === 'fullName' ? <User size={16} /> : field.id === 'email' ? <Mail size={16} /> : <Globe size={16} />}
+                             {field.id === 'fullName' && <User size={16} />}
+                             {field.id === 'email' && <Mail size={16} />}
+                             {field.id === 'phone' && <Phone size={16} />}
+                             {(field.id === 'address' || field.id === 'city' || field.id === 'state') && <MapPin size={16} />}
                            </div>
                            <input 
                               type={field.type || 'text'}
@@ -523,7 +598,10 @@ const App = () => {
                        <History className="text-blue-500" size={20} />
                        Mission Manifest
                     </h2>
-                    <button className="text-[10px] font-bold text-slate-600 hover:text-white uppercase tracking-widest transition-colors flex items-center gap-2">
+                    <button 
+                      onClick={clearActivityLog}
+                      className="text-[10px] font-bold text-slate-600 hover:text-white uppercase tracking-widest transition-colors flex items-center gap-2"
+                    >
                        Clear Logs <Trash2 size={12} />
                     </button>
                   </div>
