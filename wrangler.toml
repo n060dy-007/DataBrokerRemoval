@@ -1,11 +1,15 @@
 # wrangler.toml
-# Configuration for Cloudflare Pages + Wrangler
+#
+# This file is mainly useful for manual CLI deployments.
+# For Git-connected Cloudflare Pages projects, it is strongly recommended
+# to configure Build settings in the Cloudflare Dashboard instead.
 
 name = "antigravity-data-broker-removal"
 compatibility_date = "2025-05-01"
 
-# This is the key setting Cloudflare Pages needs when it detects wrangler.toml
+# Output directory (used by both dashboard and CLI)
 pages_build_output_dir = "dist"
 
-# You can still deploy manually with:
-#   npm run build && npx wrangler pages deploy dist
+# Build command (helps when wrangler.toml is detected during Git builds)
+[build]
+command = "npm run build"
