@@ -28,15 +28,18 @@ npm run dev
 
 ## Deploy to Cloudflare Pages (Recommended)
 
-### Option 1: Dashboard (easiest)
+### Option 1: Dashboard (Recommended & Most Reliable)
 1. Push this repo to GitHub
 2. Go to Cloudflare Dashboard → Pages → Create a project
 3. Connect your GitHub repo
-4. Build settings:
-   - **Framework preset**: Vite
+4. **Important**: In the build settings, explicitly set:
+   - **Framework preset**: `Vite`
    - **Build command**: `npm run build`
    - **Build output directory**: `dist`
-5. Deploy. Cloudflare will automatically use the `_headers` and `_redirects` files.
+5. Save the settings.
+6. Deploy / trigger a new build.
+
+> **Note**: Do **not** rely only on `wrangler.toml` for Git-connected projects. The dashboard build settings take precedence and are more reliable. The `wrangler.toml` in this repo is mainly for manual CLI deployments.
 
 ### Option 2: Wrangler CLI
 ```bash
