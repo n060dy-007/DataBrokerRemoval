@@ -29,25 +29,26 @@ npm run dev
 ## Deploy to Cloudflare Pages (Recommended)
 
 ### Option 1: Dashboard (Recommended & Most Reliable)
-1. Push this repo to GitHub
-2. Go to Cloudflare Dashboard → Pages → Create a project
-3. Connect your GitHub repo
-4. **Important**: In the build settings, explicitly set:
+This is the best way to deploy when connecting via GitHub.
+
+1. Push this repo to GitHub.
+2. In Cloudflare Dashboard → Pages → Create a project and connect the repo.
+3. **Set these build settings** (very important):
    - **Framework preset**: `Vite`
    - **Build command**: `npm run build`
    - **Build output directory**: `dist`
-5. Save the settings.
-6. Deploy / trigger a new build.
+4. Save the settings.
+5. Trigger a deployment.
 
-> **Note**: Do **not** rely only on `wrangler.toml` for Git-connected projects. The dashboard build settings take precedence and are more reliable. The `wrangler.toml` in this repo is mainly for manual CLI deployments.
+Cloudflare Pages will automatically use the `_headers` and `_redirects` files from the `public/` folder.
 
-### Option 2: Wrangler CLI
+### Option 2: Manual CLI Deploy
 ```bash
 npm run build
-npx wrangler pages deploy dist --project-name=antigravity-dbr
+npx wrangler pages deploy dist
 ```
 
-First time you will be prompted to create the Pages project.
+First time it will ask you to create/link a Pages project.
 
 After deploy you get a `*.pages.dev` URL instantly, with global caching + DDoS protection.
 
